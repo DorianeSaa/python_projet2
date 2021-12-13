@@ -11,87 +11,64 @@ links=[]
 url='https://books.toscrape.com/catalogue/category/books/default_15/index.html'  
 
 r = requests.get(url)
-# print('product_page_url :' + url)
+print('product_page_url :' + url)
 
 soup = BeautifulSoup(r.text)
 
 
-# def Visite_d_une_page(url):
+def Visite_d_une_page(url):
+	r = requests.get(url)
+	soup = BeautifulSoup(r.text)
 
-	
-# 	r = requests.get(url)
-# 	soup = BeautifulSoup(r.text)
+	title = soup.find('title')
 
-# 	title = soup.find('title')
+	tds = soup.findAll('td')
 
-# 	tds = soup.findAll('td')
+	# print(tds[0].text)
+	# [print (td.text + '\n\n') for td in tds]
 
-# # print(tds[0].text)
-# # [print (td.text + '\n\n') for td in tds]
+	image = soup.find('img')
+	images = image['src']
+	# print(image.attrs['src'])
+	# print(images)
 
-# 	image = soup.find('img')
-# 	images =image['src']
-# # print(image.attrs['src'])
-# 	# print(images)
+	description = soup.find("div", {'id': 'product_description'}).find_next("p").text
 
+	# print(description)
 
-# 	description = soup.find("div", {'id': 'product_description'}).find_next("p").text
+	review_rating = soup.find('p', {'class': "star-rating Three"}).attrs['class'][1]
 
-# 	# print(description)
+	# books = 'https://books.toscrape.com/catalogue/category/books_1/index.html'
+	# print(requests.get(books))
 
-# 	review_rating = soup.find('p', {'class': "star-rating Three"}).attrs['class'][1]
-	
+	cat = soup.find('ul', {'class': 'breadcrumb'})
+	a = cat.find('li', {'class': 'active'}).find_previous()
 
+	infos_extraites = {
+		"product_page_url": url,
 
-# 	# books = 'https://books.toscrape.com/catalogue/category/books_1/index.html'
-# 	# print(requests.get(books))
-
-# 	cat = soup.find('ul',{'class':'breadcrumb'})
-# 	a = cat.find('li',{'class':'active'}).find_previous()
-
-
-
-# 	infos_extraites ={
-# 		"product_page_url": url, 
-
-# 		"universal_product_code": soup.find('td').string,
-# 		"title" : soup.find('title').text,
-# 		"price_excluding_tax": soup.findAll('td')[2].string,
-# 		"price_including_tax": soup.findAll('td')[3].string,
-# 		"number_available" : soup.findAll('td')[5].string,
-# 		"product_description" : description,
-# 		"category" : soup.find('ul',{'class':'breadcrumb'}).find('li',{'class':'active'}).find_previous().text,
-# 		"review_rating" : review_rating,
-# 		"image_url" : images
-# 	}	
-# 	return infos_extraites
-
-# informations = Visite_d_une_page('https://books.toscrape.com/catalogue/the-coming-woman-a-novel-based-on-the-life-of-the-infamous-feminist-victoria-woodhull_993/index.html')
+		"universal_product_code": soup.find('td').string,
+		"title": soup.find('title').text,
+		"price_excluding_tax": soup.findAll('td')[2].string,
+		"price_including_tax": soup.findAll('td')[3].string,
+		"number_available": soup.findAll('td')[5].string,
+		"product_description": description,
+		"category": soup.find('ul', {'class': 'breadcrumb'}).find('li', {'class': 'active'}).find_previous().text,
+		"review_rating": review_rating,
+		"image_url": images
+	}
+	return infos_extraites
 
 
-# print(informations)
+informations = Visite_d_une_page(
+	'https://books.toscrape.com/catalogue/the-coming-woman-a-novel-based-on-the-life-of-the-infamous-feminist-victoria-woodhull_993/index.html')
 
-# with open('main.csv','w', newline='')as index:
-# 	writer=csv.writer(index, delimiter=';')
-# 	writer.writerow(informations)
+print(informations)
 
-
-
-
-
-# header = informations.keys()
-# print(getList(header))
-
-# with open('countries.csv', 'w', encoding='UTF8') as f:
-#     writer = csv.writer(f)
-
-#     # write the header
-#     writer.writerow(header)
-
-#     # write the data
-#     writer.writerow(informations)
-
-
+#with csv23.open_csv('main.csv', 'w', newline='') as index:
+#	writer = csv.writer(index, delimiter=';')
+#	writer.writerow([informations])
+# writer.writerow([url])
 
 
 # recupere_les_liens_des_catégories(url):
@@ -127,17 +104,16 @@ print(warning.text)
 
 # parcourir les differentes pages d'une catégorie
 
-#results = soup.find('form', {'class':'form-horizontal'}).find('strong')
 
-#nbre=int(results.text)
-#nbre_page=(int(nbre/20))
-# (nbre%20 !=0):
-#	nbre_page+=1
+results = soup.find('form', {'class':'form-horizontal'}).find('strong')
 
-#for i in range(nbre_page):
-#	print('https://books.toscrape.com/catalogue/category/books/default_15/page-' +str(i) + '.html')
+nbre=int(results.text)
+nbre_page=(int(nbre/20))
+if (nbre%20 !=0):
+	nbre_page+=1
 
-
+for i in range(nbre_page):
+	print('https://books.toscrape.com/catalogue/category/books/default_15/page-' +str(i) + '.html')
 
 
 # lien des livres des pages d'une caegory
@@ -163,8 +139,6 @@ print(warning.text)
 	# review_rating = soup.findAll('p', {'class':'star-rating'})
 	# for review in review_rating:
 	# 	print('nombres d\'étoiles : '+ review.attrs['class'][1])
-
-
 
 
 	# ti=[]
